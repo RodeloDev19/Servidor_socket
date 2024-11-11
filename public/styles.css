@@ -11,7 +11,7 @@ body {
 }
 
 #container {
-    max-width: 800px;
+    max-width: 90%;
     margin: 20px auto;
     padding: 20px;
     border-radius: 10px;
@@ -20,7 +20,7 @@ body {
 }
 
 h2 {
-    font-size: 36px;
+    font-size: 2.5rem;
     text-align: center;
     margin-bottom: 20px;
     animation: color-change 5s infinite;
@@ -42,6 +42,8 @@ h2 {
     flex-wrap: wrap;
     gap: 20px;
     justify-content: center;
+    max-height: 500px;
+    overflow-y: auto;
 }
 
 #rooms .room {
@@ -64,9 +66,10 @@ h2 {
 }
 
 #rooms .room h3 {
-    font-size: 18px;
+    font-size: 1.2rem;
     margin-bottom: 10px;
     color: #fff;
+    text-align: center;
 }
 
 #rooms .room a {
@@ -98,6 +101,7 @@ h2 {
 form {
     display: flex;
     gap: 10px;
+    width: 100%;
 }
 
 input[type="text"] {
@@ -125,7 +129,6 @@ button:hover {
 }
 
 .new-user, .user-left {
-    font-style: italic;
     text-align: center;
     color: #81c784;
 }
@@ -136,7 +139,7 @@ button:hover {
 
 .message.mine {
     text-align: right;
-    color:cornflowerblue;
+    color: cornflowerblue;
 }
 
 .message.mine p {
@@ -163,10 +166,27 @@ button:hover {
     #rooms .room {
         flex: 1 1 calc(50% - 20px);
     }
+    
+    h2 {
+        font-size: 2rem;
+    }
 }
 
 @media screen and (max-width: 480px) {
     #rooms .room {
         flex: 1 1 100%;
+    }
+    
+    h2 {
+        font-size: 1.8rem;
+    }
+    
+    input[type="text"],
+    button {
+        padding: 10px;
+    }
+    
+    #container {
+        padding: 15px;
     }
 }

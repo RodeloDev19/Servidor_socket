@@ -1,4 +1,4 @@
-const getUserName = () => {
+const getLocalUser = () => {
     let userName = localStorage.getItem('username');
     if (userName) {
         const sameUser = confirm(`Hola, ${userName}. Eres tu?`);
@@ -15,21 +15,20 @@ const getUserName = () => {
 const getChatRooms = () => {
     axios.get('/api/rooms').then(response => {
         const rooms = response.data;
-        let template = '';
+        let roomFormat = '';
         rooms.map(room => {
-            template += `<div class="room">
+            roomFormat += `<div class="room">
                 <h3>${room.name}</h3>
-                <a href="/chat/${room.id}">Ingresar</a>
+                <a href="/chat/${room.id}" id="button">Ingresar</a>
             </div>`;
         });
 
-        document.getElementById('rooms').innerHTML = template;
+        document.getElementById('rooms').innerHTML = roomFormat;
     }).catch(err => {
         console.log('Failed to get rooms', err);
     })
 }
 
-(() => {
-    getUserName();
-    getChatRooms();
-})();
+// Llamadas a las funciones
+getLocalUser();
+getChatRooms();

@@ -2,78 +2,66 @@ const socket = io('/');
 
 let userName = '';
 
-const getUserName = () => {
+const retrieveUserName = () => {
     userName = localStorage.getItem('username');
     if (userName) {
         document.getElementById('user').innerText = userName;
-        localStorage.setItem('username', userName);
     } else {
-        console.log('Quien chota sos?', userName);
-        window.location.href = '';
+        console.warn('Usuario no identificado:', userName);
+        window.location.href = '/login';
     }
-}
+};
 
-const initSocketEventListeners = () => {
+const startSockets = () => {
     socket.emit('newUser', {
         user: userName,
-        chat: window.location.href.split('/').pop()
+        chat: window.location.pathname.split('/').pop()
     });
     
     socket.on('newUser', (data) => {
-        sendNewUserMessage(data.user);
+        displayUserJoinedMessage(data.user);
     });
     
     socket.on('newMessage', (data) => {
-        sendNewMessage(data);
+        displayNewMessage(data);
     });
     
     socket.on('userLeft', (data) => {
-        sendUserLeftMessage(data.user);
+        displayUserLeftMessage(data.user);
     });
-}
+};
 
-const sendNewUserMessage = (name) => {
-    const p = document.createElement('p');
-    p.className = 'new-user';
-    if (name === 'Propio') {
-        p.innerText = 'Te haz unido';
-    } else {
-        p.innerText = `${name} se unió`;
-    }
-    document.getElementById('messages').append(p);
-}
+const displayUserJoinedMessage = (name) => {
+    const messageElement = document.createElement('p');
+    messageElement.className = 'new-user';
+    messageElement.innerText = name === 'Propio' ? 'Te has unido' : `${name} se unió`;
+    document.getElementById('messages').appendChild(messageElement);
+};
 
-const sendUserLeftMessage = (name) => {
-    const p = document.createElement('p');
-    p.className = 'user-left';
-    if (name === 'Propio') {
-        p.innerText = 'Te haz salido';
-    } else {
-        p.innerText = `${name} se salió`;
-    }
-    document.getElementById('messages').append(p);
-}
+const displayUserLeftMessage = (name) => {
+    const messageElement = document.createElement('p');
+    messageElement.className = 'user-left';
+    messageElement.innerText = name === 'Propio' ? 'Te has salido' : `${name} se salió`;
+    document.getElementById('messages').appendChild(messageElement);
+};
 
-const sendNewMessage = (data, mine) => {
-    const p = document.createElement('p');
-    let name = data.user;
-    if (mine) {
-        p.className = 'message mine';
-        name = 'Propio';
-    } else {
-        p.className = 'message';
-    }
-    p.innerText = `${name}: ${data.message}`;
-    document.getElementById('messages').append(p);
-}
+const displayNewMessage = (data, isOwnMessage = false) => {
+    const messageElement = document.createElement('p');
+    const senderName = isOwnMessage ? 'Propio' : data.user;
+    messageElement.className = isOwnMessage ? 'message mine' : 'message';
+    messageElement.innerText = `${senderName}: ${data.message}`;
+    document.getElementById('messages').appendChild(messageElement);
+};
 
-const initMessageForm = () => {
-    document.getElementsByTagName('form')[0].addEventListener('submit', (event) => {
+const initializeMessageForm = () => {
+    const form = document.querySelector('form');
+    form.addEventListener('submit', (event) => {
         event.preventDefault();
-        const input = document.getElementsByTagName('input')[0];
-        const message = input.value;
+        const input = form.querySelector('input');
+        const message = input.value.trim();
         if (!message) return;
-        sendNewMessage({ message }, true);
+
+        displayNewMessage({ message }, true);
 
         socket.emit('newMessage', {
             user: userName,
@@ -82,15 +70,10 @@ const initMessageForm = () => {
     
         input.value = '';
     });
-}
+};
 
-(() => {
-    getUserName();
-    initSocketEventListeners();
-    initMessageForm();
-    sendNewUserMessage('Propio'); 
-
-    window.onbeforeunload = () => {
-        return 'Deseas salir de verdad?';
-    };
-})();
+// Inicialización del chat
+retrieveUserName();
+startSockets();
+initializeMessageForm();
+displayUserJoinedMessage('Propio');
